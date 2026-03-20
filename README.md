@@ -1,4 +1,4 @@
-**Workshop Lakehouse Moderno — Data HandsON (DuckDB + S3 Tables)**
+## **Workshop Lakehouse Moderno — Data HandsON (DuckDB + S3 Tables)**
 
 Resumo
 ------
