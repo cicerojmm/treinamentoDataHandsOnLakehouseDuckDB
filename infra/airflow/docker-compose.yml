@@ -1,0 +1,116 @@
+version: "3.9"
+
+x-airflow-common: &airflow-common
+  image: datahandson/airflow:latest
+  build:
+    context: ./airflow
+    dockerfile: Dockerfile
+    args:
+      DOCKER_GID: ${DOCKER_GID:-998}   # getent group docker | cut -d: -f3
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR:                    LocalExecutor
+    AIRFLOW__CORE__LOAD_EXAMPLES:               "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN:        postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
+    AIRFLOW__WEBSERVER__SECRET_KEY:             ${AIRFLOW_SECRET_KEY:-changeme_use_random_string}
+
+    # Cosmos — aponta para o projeto dbt dentro do container
+    AIRFLOW__COSMOS__DBT_PROJECT_DIR: /dbt
+    AIRFLOW__COSMOS__DBT_PROFILES_DIR: /dbt/profiles
+
+    # AWS — Instance Role da EC2 (sem chaves estáticas)
+    AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-2}
+    S3TABLES_ARN:       ${S3TABLES_ARN}
+
+    # DockerOperator precisa do socket do Docker host
+    DOCKER_HOST: unix:///var/run/docker.sock
+
+    # Dev local (opcional):
+    # AWS_ACCESS_KEY_ID:     ${AWS_ACCESS_KEY_ID}
+    # AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./dbt:/dbt:ro                          # projeto dbt (leitura)
+    - /var/run/docker.sock:/var/run/docker.sock  # Docker-in-Docker
+    - airflow-logs:/opt/airflow/logs
+  depends_on:
+    postgres-airflow:
+      condition: service_healthy
+  networks:
+    - internal
+
+services:
+
+  # ── Banco de metadados do Airflow ────────────────────────────
+  postgres-airflow:
+    image: postgres:16-alpine
+    container_name: postgres-airflow
+    environment:
+      POSTGRES_USER:     airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB:       airflow
+    volumes:
+      - postgres-airflow-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  # ── Inicialização do Airflow (roda uma vez) ──────────────────
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow-init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create \
+          --username ${AIRFLOW_USER:-admin} \
+          --password ${AIRFLOW_PASSWORD:-admin} \
+          --firstname Admin \
+          --lastname User \
+          --role Admin \
+          --email admin@datahandson.com
+    restart: "no"
+
+  # ── Scheduler ────────────────────────────────────────────────
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    command: scheduler
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "airflow", "jobs", "check", "--job-type", "SchedulerJob"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ── Webserver ────────────────────────────────────────────────
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres-airflow-data:
+  airflow-logs:
+
+networks:
+  internal:
+    driver: bridge

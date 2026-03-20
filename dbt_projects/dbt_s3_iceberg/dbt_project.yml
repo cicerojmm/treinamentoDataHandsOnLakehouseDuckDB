@@ -1,0 +1,20 @@
+name: datahandson
+version: "1.0.0"
+config-version: 2
+
+profile: datahandson
+
+model-paths:   ["models"]
+seed-paths:    ["seeds"]
+test-paths:    ["tests"]
+macro-paths:   ["macros"]
+target-path:   "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  s3_parquet_sources:
+    bronze_s3:
+      links:   "s3://cjmm-mds-lake-raw/airbyte_postgres_movielens_raw/vw_links/*.parquet"
+      movies:  "s3://cjmm-mds-lake-raw/airbyte_postgres_movielens_raw/vw_movies/*.parquet"
+      ratings: "s3://cjmm-mds-lake-raw/airbyte_postgres_movielens_raw/vw_ratings/*.parquet"
+      tags:    "s3://cjmm-mds-lake-raw/airbyte_postgres_movielens_raw/vw_tags/*.parquet"

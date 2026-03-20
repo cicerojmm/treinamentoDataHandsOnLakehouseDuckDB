@@ -1,0 +1,6 @@
+dlt[pyiceberg,filesystem,sql_database]>=1.23.0
+psycopg2-binary>=2.9
+pyiceberg[s3]>=0.9.1
+sqlalchemy>=2.0.18
+boto3>=1.34
+pyarrow>=14.0

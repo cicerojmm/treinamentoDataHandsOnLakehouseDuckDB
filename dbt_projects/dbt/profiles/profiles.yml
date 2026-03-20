@@ -1,0 +1,19 @@
+datahandson:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /tmp/dbt.duckdb
+      extensions:
+        - iceberg
+      secrets:
+        - type: s3
+          key_id: "{{ env_var('AWS_ACCESS_KEY_ID') }}"
+          secret: "{{ env_var('AWS_SECRET_ACCESS_KEY') }}"
+          region: "{{ env_var('AWS_DEFAULT_REGION', 'us-east-2') }}"
+      attach:
+        - path: "arn:aws:s3tables:us-east-2:296735965303:bucket/datahandson-lakehouse-duckdb"
+          alias: "s3_tables"
+          type: "iceberg"
+          endpoint_type: "s3_tables"
+          read_only: false

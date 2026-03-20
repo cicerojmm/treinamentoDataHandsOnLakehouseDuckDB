@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: s3_tables
+    schema: bronze
+    tables:
+      - name: links
+        description: "Links para IMDb e TMDb dos filmes"
+      - name: movies
+        description: "Informações dos filmes (título, gêneros)"
+      - name: ratings
+        description: "Avaliações dos usuários para filmes"
+      - name: tags
+        description: "Tags aplicadas pelos usuários aos filmes"

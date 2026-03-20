@@ -1,0 +1,36 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node
+node_modules/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
+crash.log
+
+# Docker
+**/duckdb/*.db
+**/duckdb/*.duckdb
+
+# Logs and build
+*.log
+dist/
+build/
+

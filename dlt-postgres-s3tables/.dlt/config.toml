@@ -1,0 +1,9 @@
+# .dlt/config.toml
+
+[runtime]
+log_level = "INFO"
+namespace = "bronze"
+
+[sources.sql_database]
+# Número de linhas por chunk (ajusta conforme memória disponível)
+chunk_size = 10000

@@ -1,0 +1,189 @@
+Here are the table schemas for the DuckDB database <duckdb_schemas>.
+
+<duckdb_schemas>
+
+<duckdb_schema>
+CREATE TABLE gold.gold_genre_analytics (
+    genre STRING,
+    total_movies INTEGER,
+    decades_active INTEGER,
+    first_movie_year INTEGER,
+    last_movie_year INTEGER,
+    total_ratings INTEGER,
+    total_users INTEGER,
+    avg_rating DOUBLE,
+    stddev_rating DOUBLE,
+    median_rating DOUBLE,
+    excellent_ratings INTEGER,
+    good_ratings INTEGER,
+    average_ratings INTEGER,
+    poor_ratings INTEGER,
+    pct_positive DOUBLE,
+    unique_tags INTEGER,
+    positive_tags INTEGER,
+    negative_tags INTEGER,
+    avg_ratings_per_movie DOUBLE,
+    avg_tags_per_movie DOUBLE,
+    movies_1990s INTEGER,
+    movies_2000s INTEGER,
+    movies_2010s INTEGER,
+    rank_by_movies INTEGER,
+    rank_by_ratings INTEGER,
+    rank_by_quality INTEGER,
+    rank_by_engagement INTEGER,
+    quality_tier STRING,
+    popularity_tier STRING,
+    genre_score DOUBLE,
+    processed_at TIMESTAMP
+);
+</duckdb_schema>
+
+
+<duckdb_schema>
+CREATE TABLE gold.gold_movie_recommendations (
+    movie_id INTEGER,
+    movie_title STRING,
+    similar_movie_id INTEGER,
+    similar_movie_title STRING,
+    similar_movie_year INTEGER,
+    similar_movie_rating DOUBLE,
+    similar_movie_ratings_count INTEGER,
+    common_genres STRING,
+    genre_similarity DOUBLE,
+    year_diff INTEGER,
+    recommendation_score DOUBLE,
+    recommendation_rank INTEGER,
+    processed_at TIMESTAMP
+);
+</duckdb_schema>
+
+
+<duckdb_schema>
+CREATE TABLE gold.gold_temporal_trends (
+    month STRING,
+    year INTEGER,
+    month_num INTEGER,
+    total_ratings INTEGER,
+    active_users INTEGER,
+    movies_rated INTEGER,
+    avg_rating DOUBLE,
+    ratings_excellent INTEGER,
+    ratings_good INTEGER,
+    ratings_average INTEGER,
+    ratings_poor INTEGER,
+    action_ratings INTEGER,
+    comedy_ratings INTEGER,
+    drama_ratings INTEGER,
+    thriller_ratings INTEGER,
+    romance_ratings INTEGER,
+    action_avg_rating DOUBLE,
+    comedy_avg_rating DOUBLE,
+    drama_avg_rating DOUBLE,
+    ratings_1990s INTEGER,
+    ratings_2000s INTEGER,
+    ratings_2010s INTEGER,
+    ratings_growth_pct DOUBLE,
+    users_growth_pct DOUBLE,
+    ratings_ma3 DOUBLE,
+    users_ma3 DOUBLE,
+    avg_rating_ma3 DOUBLE,
+    rank_by_ratings INTEGER,
+    rank_by_users INTEGER,
+    action_pct DOUBLE,
+    comedy_pct DOUBLE,
+    drama_pct DOUBLE,
+    processed_at TIMESTAMP
+);
+</duckdb_schema>
+
+
+<duckdb_schema>
+CREATE TABLE gold.gold_user_behavior (
+    user_id INTEGER,
+    total_ratings INTEGER,
+    movies_rated INTEGER,
+    avg_rating_given DOUBLE,
+    stddev_rating DOUBLE,
+    pct_positive_ratings DOUBLE,
+    ratings_5_stars INTEGER,
+    ratings_4_stars INTEGER,
+    ratings_3_stars INTEGER,
+    ratings_low INTEGER,
+    first_rating_date DATE,
+    last_rating_date DATE,
+    days_active INTEGER,
+    years_active INTEGER,
+    months_active INTEGER,
+    ratings_per_day DOUBLE,
+    favorite_hour INTEGER,
+    favorite_day_of_week STRING,
+    action_count INTEGER,
+    comedy_count INTEGER,
+    drama_count INTEGER,
+    thriller_count INTEGER,
+    romance_count INTEGER,
+    horror_count INTEGER,
+    scifi_count INTEGER,
+    action_avg_rating DOUBLE,
+    comedy_avg_rating DOUBLE,
+    drama_avg_rating DOUBLE,
+    favorite_genre STRING,
+    total_tags_created INTEGER,
+    unique_tags_used INTEGER,
+    positive_tags INTEGER,
+    negative_tags INTEGER,
+    user_profile STRING,
+    engagement_level STRING,
+    genre_diversity_score DOUBLE,
+    processed_at TIMESTAMP
+);
+</duckdb_schema>
+
+</duckdb_schemas>
+
+Here are examples of DuckDB queries <duckdb_examples>.
+
+<duckdb_examples>
+
+<duckdb_example>
+SELECT 
+    genre,
+    total_movies,
+    avg_rating,
+    rank_by_quality
+FROM s3_tables_db.gold.gold_genre_analytics
+ORDER BY avg_rating DESC
+LIMIT 10;
+</duckdb_example>
+
+<duckdb_example>
+SELECT 
+    movie_title,
+    similar_movie_title,
+    recommendation_score
+FROM s3_tables_db.gold.gold_movie_recommendations
+WHERE movie_title = 'Toy Story'
+ORDER BY recommendation_score DESC
+LIMIT 5;
+</duckdb_example>
+
+<duckdb_example>
+SELECT
+    year,
+    SUM(total_ratings) AS total_ratings,
+    AVG(avg_rating) AS avg_rating
+FROM s3_tables_db.gold.gold_temporal_trends
+GROUP BY year
+ORDER BY year;
+</duckdb_example>
+
+<duckdb_example>
+SELECT
+    favorite_genre,
+    COUNT(*) AS users
+FROM s3_tables_db.gold.gold_user_behavior
+GROUP BY favorite_genre
+ORDER BY users DESC;
+</duckdb_example>
+
+</duckdb_examples>

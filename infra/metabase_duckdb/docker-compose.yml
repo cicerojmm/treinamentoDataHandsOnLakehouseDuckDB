@@ -1,0 +1,52 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: metabase_postgres
+    environment:
+      POSTGRES_DB: metabase
+      POSTGRES_USER: metabase
+      POSTGRES_PASSWORD: metabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - metabase_net
+
+  metabase:
+    build: .
+    container_name: metabase
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      # Banco auxiliar do Metabase (PostgreSQL)
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS: metabase
+      MB_DB_HOST: postgres
+      # Timezone
+      JAVA_TIMEZONE: America/Sao_Paulo
+    volumes:
+      # Arquivo DuckDB persistente + init.sql
+      - ./duckdb:/duckdb
+      # Plugins (driver já vem no build, mas monta para facilitar updates)
+      - plugins_data:/plugins
+    networks:
+      - metabase_net
+
+volumes:
+  postgres_data:
+  plugins_data:
+
+networks:
+  metabase_net:
+    driver: bridge

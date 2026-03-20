@@ -1,0 +1,46 @@
+{
+    "path_count": 142,
+    "parsed_path_count": 142,
+    "static_analysis_path_count": 9,
+    "static_analysis_parsed_path_count": 5,
+    "is_partial_parse_enabled": true,
+    "is_static_analysis_enabled": true,
+    "read_files_elapsed": 0.08923426299588755,
+    "load_macros_elapsed": 1.55339101300342,
+    "parse_project_elapsed": 0.5039734969905112,
+    "patch_sources_elapsed": 7.800001185387373e-06,
+    "process_manifest_elapsed": 0.04292435001116246,
+    "load_all_elapsed": 2.3739921590022277,
+    "projects": [
+        {
+            "project_name": "datahandson",
+            "elapsed": 0.48865283900522627,
+            "parsers": [
+                {
+                    "parser": "model",
+                    "elapsed": 0.48178092899615876,
+                    "parsed_path_count": 9
+                }
+            ],
+            "parsed_path_count": 9
+        },
+        {
+            "project_name": "dbt_duckdb",
+            "elapsed": 0.007388462981907651,
+            "parsers": [],
+            "parsed_path_count": 0
+        },
+        {
+            "project_name": "dbt",
+            "elapsed": 0.007817728008376434,
+            "parsers": [
+                {
+                    "parser": "doc",
+                    "elapsed": 0.0002818040084093809,
+                    "parsed_path_count": 1
+                }
+            ],
+            "parsed_path_count": 1
+        }
+    ]
+}
