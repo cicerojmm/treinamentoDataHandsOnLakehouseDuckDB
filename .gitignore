@@ -25,7 +25,16 @@ terraform.tfstate.*
 .terraform.lock.hcl
 crash.log
 
-# Docker
+# dbt artifacts
+target/
+dbt_packages/
+.dbt/
+run_results.json
+manifest.json
+catalog.json
+logs/
+
+# duckdb
 **/duckdb/*.db
 **/duckdb/*.duckdb
 
@@ -33,4 +42,3 @@ crash.log
 *.log
 dist/
 build/
-

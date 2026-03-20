@@ -1,4 +1,4 @@
-## **Workshop Lakehouse Moderno — Data HandsON (DuckDB + S3 Tables)**
+##**Workshop Lakehouse Moderno — Data HandsON (DuckDB + S3 Tables)**
 
 Resumo
 ------
@@ -155,6 +155,50 @@ Depois gere o `target/manifest.json` e envie para S3 (exemplo):
 
 ```bash
 aws s3 cp target/manifest.json s3://<bucket-deploy>/dbt/manifest.json
+
+**Exemplo de configuração de materialização de modelo `dbt`**
+
+Abaixo está um exemplo de configuração que você pode colocar no topo de um modelo `dbt` (ou em um `config` Jinja) para criar uma tabela incremental no formato Iceberg, particionada por ano/mês e com políticas de escrita/compactação:
+
+```jinja
+{{
+  config(
+    -- MATERIALIZAÇÃO
+    materialized='incremental',      -- table, view, incremental, ephemeral
+    incremental_strategy='merge',    -- merge, append, delete+insert
+
+    -- CHAVES
+    unique_key='id',                 -- string ou lista ['id', 'data']
+    merge_update_columns=['valor', 'updated_at'],  -- só atualiza essas colunas
+
+    -- LOCALIZAÇÃO
+    database='lakehouse',            -- nome do ATTACH
+    schema='silver',                 -- namespace/schema
+
+    -- FORMATO
+    table_format='iceberg',          -- iceberg, delta, hudi
+    file_format='parquet',           -- parquet, orc
+
+    -- PARTIÇÃO
+    partition_by=['ano', 'mes'],     -- lista de colunas
+
+    -- ICEBERG ESPECÍFICO
+    table_properties={
+      'write.format.default':             'parquet',
+      'write.parquet.compression-codec':  'snappy',
+      'write.metadata.compression-codec': 'gzip',
+      'write.target-file-size-bytes':     '134217728',  -- 128MB
+    },
+
+    -- COMPORTAMENTO
+    full_refresh=false,              -- ignora --full-refresh global
+    on_schema_change='sync_all_columns',  -- fail, ignore, append_new_columns, sync_all_columns
+    grants={'select': ['metabase']}  -- permissões
+  )
+}}
+```
+
+Use esse bloco como referência ao materializar modelos que serão armazenados em S3 Tables (Iceberg) e processados pelo pipeline. Ajuste `database`, `schema`, `partition_by` e `table_properties` conforme seu workload.
 ```
 
 7) Observabilidade e logs

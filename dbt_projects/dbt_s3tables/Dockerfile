@@ -16,10 +16,5 @@ COPY profiles/profiles.yml /root/.dbt/profiles.yml
 
 ENV DBT_PROFILES_DIR=/root/.dbt
 
-#RUN dbt parse --project-dir /dbt --profiles-dir /root/.dbt
-
-# ENTRYPOINT ["dbt"]
-# CMD ["--help"]
-
 ENTRYPOINT []
 CMD ["/usr/local/bin/dbt", "--help"]
